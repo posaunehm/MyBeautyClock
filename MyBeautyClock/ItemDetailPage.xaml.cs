@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 
 using System.Net.Http;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 
 
 // アイテム詳細ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234232 を参照してください
@@ -28,9 +29,26 @@ namespace MyBeautyClock
     /// </summary>
     public sealed partial class ItemDetailPage : MyBeautyClock.Common.LayoutAwarePage
     {
+        DataTransferManager datatransferManager;
         public ItemDetailPage()
         {
             this.InitializeComponent();
+            datatransferManager = DataTransferManager.GetForCurrentView();
+            datatransferManager.DataRequested += datatransferManager_DataRequested;
+        }
+
+        private void datatransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+        {
+            //引数argsのプロパティにShareするデータを入れてく。
+            args.Request.Data.Properties.Title = "MyBeautyClock";
+            args.Request.Data.Properties.Description = "この美人の共有先";
+            var bijin = (SampleDataItem)flipView.SelectedItem;
+            //bijin.Path = 地域
+            //bijin.Current=時間
+            var bijinhour = bijin.Current.ToString("HH");
+            var bijinminute = bijin.Current.ToString("mm");
+
+            args.Request.Data.SetText(bijin.Title.ToString() + "にいる" + bijinhour + ":" + bijinminute + "の" + "美人さんかわいい！！ http://www.bijint.com/");
         }
 
         /// <summary>
